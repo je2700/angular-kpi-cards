@@ -1,0 +1,146 @@
+<div class="dashboard" [class]="'dashboard--' + theme">
+  
+  <!-- Header -->
+  <header class="dashboard__header">
+    <div class="dashboard__title-section">
+      <h1 class="dashboard__title">■ KPI Dashboard</h1>
+      <p class="dashboard__subtitle">{{ getTrendSummary() }}</p>
+    </div>
+    
+    <div class="dashboard__actions">
+      <button class="dashboard__action-btn" (click)="refreshData()" title="Daten aktualisieren">
+        <span class="dashboard__action-icon">↻</span>
+        <span class="dashboard__action-label">Aktualisieren</span>
+      </button>
+      <button class="dashboard__action-btn" (click)="exportData()" title="Daten exportieren">
+        <span class="dashboard__action-icon">↓</span>
+        <span class="dashboard__action-label">Export</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Summary Stats -->
+  <div class="dashboard__summary">
+    <div class="dashboard__summary-card">
+      <span class="dashboard__summary-icon">▲</span>
+      <div class="dashboard__summary-content">
+        <span class="dashboard__summary-value">{{ summaryStats.upTrends || 0 }}</span>
+        <span class="dashboard__summary-label">Positive Trends</span>
+      </div>
+    </div>
+    
+    <div class="dashboard__summary-card">
+      <span class="dashboard__summary-icon">▼</span>
+      <div class="dashboard__summary-content">
+        <span class="dashboard__summary-value">{{ summaryStats.downTrends || 0 }}</span>
+        <span class="dashboard__summary-label">Negative Trends</span>
+      </div>
+    </div>
+    
+    <div class="dashboard__summary-card">
+      <span class="dashboard__summary-icon">■</span>
+      <div class="dashboard__summary-content">
+        <span class="dashboard__summary-value">{{ summaryStats.totalKpis || 0 }}</span>
+        <span class="dashboard__summary-label">Gesamt KPIs</span>
+      </div>
+    </div>
+    
+    <div class="dashboard__summary-card">
+      <span class="dashboard__summary-icon">◆</span>
+      <div class="dashboard__summary-content">
+        <span class="dashboard__summary-value">{{ (summaryStats.averageTrendPercentage || 0) | number:'1.1-1' }}%</span>
+        <span class="dashboard__summary-label">Ø Veränderung</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="dashboard__controls">
+    
+    <!-- Filter Controls -->
+    <div class="dashboard__control-group">
+      <label class="dashboard__control-label">Filter:</label>
+      <div class="dashboard__filter-buttons">
+        <button 
+          *ngFor="let filter of filterOptions"
+          class="dashboard__filter-btn"
+          [class.dashboard__filter-btn--active]="selectedFilter === filter.value"
+          (click)="onFilterChange(filter.value)">
+          <span class="dashboard__filter-icon">{{ filter.icon }}</span>
+          <span class="dashboard__filter-label">{{ filter.label }}</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- View Mode Controls -->
+    <div class="dashboard__control-group">
+      <label class="dashboard__control-label">Ansicht:</label>
+      <div class="dashboard__view-buttons">
+        <button 
+          *ngFor="let view of viewOptions"
+          class="dashboard__view-btn"
+          [class.dashboard__view-btn--active]="viewMode === view.value"
+          (click)="onViewModeChange($any(view.value))"
+          [title]="view.label">
+          <span class="dashboard__view-icon">{{ view.icon }}</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Theme Controls -->
+    <div class="dashboard__control-group">
+      <label class="dashboard__control-label">Theme:</label>
+      <div class="dashboard__theme-buttons">
+        <button 
+          *ngFor="let themeOption of themeOptions"
+          class="dashboard__theme-btn"
+          [class.dashboard__theme-btn--active]="theme === themeOption.value"
+          (click)="onThemeChange($any(themeOption.value))"
+          [title]="themeOption.label">
+          <span class="dashboard__theme-icon">{{ themeOption.icon }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards Grid -->
+  <div class="dashboard__content" [class]="'dashboard__content--' + viewMode">
+    
+    <!-- Loading State -->
+    <div class="dashboard__loading" *ngIf="isLoading">
+      <div class="dashboard__loading-spinner"></div>
+      <p class="dashboard__loading-text">Lade KPI-Daten...</p>
+    </div>
+    
+    <!-- Empty State -->
+    <div class="dashboard__empty" *ngIf="!isLoading && filteredKpiData.length === 0">
+      <span class="dashboard__empty-icon">■</span>
+      <h3 class="dashboard__empty-title">Keine KPIs gefunden</h3>
+      <p class="dashboard__empty-text">Versuchen Sie einen anderen Filter oder fügen Sie neue KPIs hinzu.</p>
+    </div>
+    
+    <!-- KPI Cards -->
+    <div class="dashboard__cards" *ngIf="!isLoading && filteredKpiData.length > 0">
+      <app-kpi-card 
+        *ngFor="let kpi of filteredKpiData; trackBy: trackByKpi"
+        [data]="kpi"
+        [cardType]="getCardType()"
+        [theme]="theme"
+        class="dashboard__card"
+        [class]="'dashboard__card--' + kpi.type">
+      </app-kpi-card>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="dashboard__footer">
+    <div class="dashboard__footer-content">
+      <span class="dashboard__footer-text">
+        {{ filteredKpiData.length }} von {{ kpiData.length }} KPIs angezeigt
+      </span>
+      <span class="dashboard__footer-timestamp">
+        Zuletzt aktualisiert: {{ getCurrentTime() }}
+      </span>
+    </div>
+  </footer>
+</div>

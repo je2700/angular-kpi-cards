@@ -1,0 +1,8 @@
+// SVG Icon Styling Extension for KPI Cards
+.kpi-card__icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--accent-color);
+  fill: none;
+  stroke-width: 2;
+}

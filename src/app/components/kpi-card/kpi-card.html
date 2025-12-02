@@ -1,0 +1,76 @@
+<div class="kpi-card" 
+     [class]="'kpi-card--' + cardType + ' kpi-card--' + theme"
+     [style.--accent-color]="data.color || '#4F46E5'">
+  
+  <!-- Header -->
+  <div class="kpi-card__header">
+    <div class="kpi-card__icon" *ngIf="data.icon">
+      <span [innerHTML]="data.icon"></span>
+    </div>
+    <div class="kpi-card__title-group">
+      <h3 class="kpi-card__title">{{ data.title }}</h3>
+      <p class="kpi-card__description" *ngIf="data.description">{{ data.description }}</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="kpi-card__content">
+    
+    <!-- Primary Value -->
+    <div class="kpi-card__value-section">
+      <div class="kpi-card__main-value">
+        {{ formatValue(data.value) }}
+        <span class="kpi-card__unit" *ngIf="data.unit">{{ data.unit }}</span>
+      </div>
+      
+      <!-- Trend Indicator -->
+      <div class="kpi-card__trend" *ngIf="data.trend" [class]="getTrendClass()">
+        <span class="kpi-card__trend-icon">{{ getTrendIcon() }}</span>
+        <span class="kpi-card__trend-value" *ngIf="data.trendPercentage">
+          {{ data.trendPercentage }}%
+        </span>
+      </div>
+    </div>
+
+    <!-- Progress Bar (for progress type) -->
+    <div class="kpi-card__progress" *ngIf="data.type === 'progress' && data.target">
+      <div class="kpi-card__progress-bar">
+        <div class="kpi-card__progress-fill" 
+             [style.width.%]="getProgressPercentage()"></div>
+      </div>
+      <div class="kpi-card__progress-labels">
+        <span>{{ formatValue(data.value) }}</span>
+        <span>{{ formatValue(data.target) }}</span>
+      </div>
+    </div>
+
+    <!-- Comparison (for comparison type) -->
+    <div class="kpi-card__comparison" *ngIf="data.type === 'comparison' && data.previousValue">
+      <div class="kpi-card__comparison-item">
+        <span class="kpi-card__comparison-label">Vorheriger Wert</span>
+        <span class="kpi-card__comparison-value">{{ formatValue(data.previousValue) }}</span>
+      </div>
+      <div class="kpi-card__comparison-change" [class]="getTrendClass()">
+        <span>{{ getTrendIcon() }}</span>
+        <span>{{ data.trendPercentage }}%</span>
+      </div>
+    </div>
+
+    <!-- Chart (for chart type) -->
+    <div class="kpi-card__chart" *ngIf="data.chartData && (cardType === 'chart' || cardType === 'detailed')">
+      <canvas #chartCanvas></canvas>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="kpi-card__footer" *ngIf="cardType === 'detailed'">
+    <div class="kpi-card__meta">
+      <span class="kpi-card__last-updated">Zuletzt aktualisiert: gerade eben</span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="kpi-card__loading" *ngIf="!data">
+    <div class="kpi-card__skeleton"></div>
+  </div>
+</div>
